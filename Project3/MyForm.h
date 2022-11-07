@@ -2,6 +2,8 @@
 #include <conio.h>
 #include <math.h>
 #include <vector>
+#include <fstream>
+#include <string>
 
 #define M_PI 3.1415926
 
@@ -160,11 +162,12 @@ namespace Project3 {
 			// pictureBox1
 			// 
 			this->pictureBox1->BackColor = System::Drawing::Color::White;
-			this->pictureBox1->Location = System::Drawing::Point(12, 12);
+			this->pictureBox1->Location = System::Drawing::Point(0, 0);
 			this->pictureBox1->Name = L"pictureBox1";
-			this->pictureBox1->Size = System::Drawing::Size(802, 745);
+			this->pictureBox1->Size = System::Drawing::Size(1920, 1280);
 			this->pictureBox1->TabIndex = 2;
 			this->pictureBox1->TabStop = false;
+			this->pictureBox1->Image = gcnew Bitmap(256, 256);
 			// 
 			// button2
 			// 
@@ -233,7 +236,7 @@ namespace Project3 {
 							PointF p2 = PointF::Add((PointF)arr[j], centerSize);
 						
 							gr->DrawLine(pen, p1, p2);
-							std::printf("Drawed Line: y = %f*x + %f \t byPoints (%f, %f), (%f, %f)\n", k, b, p1.X, p1.Y, p2.X, p2.Y);
+							//printf("Drawed Line: y = %f*x + %f \t byPoints (%f, %f), (%f, %f)\n", k, b, p1.X, p1.Y, p2.X, p2.Y);
 							return;
 						}
 					}
@@ -248,7 +251,7 @@ namespace Project3 {
 				b1 = point.Y-k1*point.X,
 				b2 = point.Y-k2*point.X;
 
-			printf("\nDraw crosshair:\n");
+			//printf("\nDraw crosshair:\n");
 			drawLine(gr, pen, center, k1, b1);
 			drawLine(gr, pen, center, k2, b2);
 
@@ -256,10 +259,12 @@ namespace Project3 {
 
 		private: Void draw(Graphics^ gr, Pen^ pen, PointF& point, float angle) {
 			
-			float width = pictureBox1->Size.Width;
-			float height = pictureBox1->Size.Height;
+			float width = 256;
+			float height = 256;
 
-			PointF center(width / 2, height / 2);
+			//printf("width: %f;\theight: %f\n", width, height);
+
+			PointF center(width/2, height/2);
 
 			gr->Clear(Color::White);
 
@@ -267,9 +272,10 @@ namespace Project3 {
 			pen->Color = Color::Black;
 			drawCrosshair(gr, pen, center, PointF(0, 0), 0);
 
-			pen->Width = 2;
+			pen->Width = 3;
 			pen->Color = Color::Red;
 			drawCrosshair(gr, pen, center, point, angle);
+
 		}
 
 		private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) {
@@ -277,24 +283,36 @@ namespace Project3 {
 			float x =  Convert::ToDouble(numericUpDown1->Value);
 			float y = -Convert::ToDouble(numericUpDown2->Value);
 			float da = Convert::ToDouble(numericUpDown5->Value);
-
-			Graphics^ gr = pictureBox1->CreateGraphics();
-			Pen^ pen = gcnew Pen(Color::Black);
-
-			PointF point(x, y);
-
-			float width = pictureBox1->Size.Width;
-			float height = pictureBox1->Size.Height;
-
-			draw(gr, pen, point, da);
 		}
+
 	private: System::Void label3_Click(System::Object^ sender, System::EventArgs^ e) {
 	}
+
 	private: System::Void button2_Click(System::Object^ sender, System::EventArgs^ e) {
-		numericUpDown1->Value = randRange(-300, 300);
-		numericUpDown2->Value = randRange(-300, 300);
-		numericUpDown5->Value = randRange(-360, 360);
-		button1_Click(sender, e);
+		Graphics^ gr = Graphics::FromImage(pictureBox1->Image);
+		Pen^ pen = gcnew Pen(Color::Black);
+
+		int n = 1000;
+		printf("saving...\n");
+		std::ofstream fout("parametrs.txt");
+		for (Int32 i = 0; i < n; ++i) {
+			float x = randRange(-128, 128) * 1.0 + 1.0*randRange(0, 99)/100;
+			float y = randRange(-128, 128) * 1.0 + 1.0 * randRange(0, 99) / 100;
+			float da = randRange(0, 45) * 1.0 + 1.0 * randRange(0, 99) / 100;
+			
+			draw(gr, pen, PointF(x, y), da);
+
+			String^ out = gcnew String("images\\image");
+			out += i.ToString() + gcnew String(".jpg");
+			if (pictureBox1->Image == nullptr) {
+				printf("image is NULL!\n");
+				continue;
+			}
+			fout << x << ' ' << y << ' ' << da << '\n';
+			pictureBox1->Image->Save(out, Imaging::ImageFormat::Jpeg);
+		}
+		fout.close();
+		printf("OK\n");
 	}
 };
 }
