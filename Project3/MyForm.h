@@ -267,22 +267,17 @@ namespace Project3 {
 			PointF center(width/2, height/2);
 
 			gr->Clear(Color::White);
-
+			/*
 			pen->Width = 1;
 			pen->Color = Color::Black;
 			drawCrosshair(gr, pen, center, PointF(0, 0), 0);
+			*/
 
-			pen->Width = 3;
-			pen->Color = Color::Red;
 			drawCrosshair(gr, pen, center, point, angle);
 
 		}
 
 		private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) {
-			loaded = true;
-			float x =  Convert::ToDouble(numericUpDown1->Value);
-			float y = -Convert::ToDouble(numericUpDown2->Value);
-			float da = Convert::ToDouble(numericUpDown5->Value);
 		}
 
 	private: System::Void label3_Click(System::Object^ sender, System::EventArgs^ e) {
@@ -291,8 +286,10 @@ namespace Project3 {
 	private: System::Void button2_Click(System::Object^ sender, System::EventArgs^ e) {
 		Graphics^ gr = Graphics::FromImage(pictureBox1->Image);
 		Pen^ pen = gcnew Pen(Color::Black);
+		pen->Width = 3;
+		pen->Color = Color::Red;
 
-		int n = 1000;
+		int n = 15;
 		printf("saving...\n");
 		std::ofstream fout("parametrs.txt");
 		for (Int32 i = 0; i < n; ++i) {
